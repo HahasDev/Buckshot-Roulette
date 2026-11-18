@@ -118,3 +118,18 @@ box-sizing: content-box;
     display: flex;
     justify-content: space-between; 
 }
+
+
+
+#game-started
+{
+  
+   border: 2px solid gray;
+  border-radius: 0.5em;
+  background-color: gray;
+
+  height: 80vh;
+  width: 100vw;
+
+
+}
