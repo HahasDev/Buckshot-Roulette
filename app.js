@@ -4,7 +4,8 @@ const openInstructionsButtonEl = document.querySelector('#open-instructions')
 const instructionsModalEl = document.querySelector('#instructions')
 const closeInstructionsButtonEl = document.querySelector('#close-instructions')
 
-const startButtonEl = document.querySelector('.game-panel')
+const startButtonEl = document.querySelector('#start')
+const panelEl = document.querySelector('.game-panel')
 const gameStartedEl = document.querySelector('#game-started')
 
 const shootPlayer = document.getElementById('shootPlayer')
@@ -78,6 +79,7 @@ startButtonEl.addEventListener('click', () => {
   startButtonEl.style.display = 'none'
   gameStartedEl.removeAttribute("hidden")
   console.log(gameStartedEl);
+  panelEl.style.display = 'none'
 })
 
 
@@ -85,7 +87,7 @@ shootDealer.addEventListener('click', () => {
   
   console.log(champer[champer.length-1]);
     if (champer[champer.length -1] === 1) {
-      
+
       dealerHealth = dealerHealth - 1
       console.log(dealerHealth);
       champer.pop()
