@@ -16,6 +16,10 @@ const useMagnifierBtn = document.getElementById('magnifier')
 const useHandSawBtn = document.getElementById('handSaw')
 const useHandcuffBtn = document.getElementById('handcuff')
 
+const playerHeartsEl = document.querySelectorAll(".player-hearts .heart");
+const dealerHeartsEl = document.querySelectorAll('.dealer-hearts .heart');
+
+const shellsEls = document.querySelector('.shells');
 
 console.log(openInstructionsButtonEl, instructionsModalEl)
 console.dir(startButtonEl);
@@ -58,7 +62,8 @@ let isCuffUsed = false
 
 let numberOfBullets = getRandomMinToMax(3,8)
 
-
+ let liveShell = 0
+ let emptyShell = 0
 
 
 
@@ -66,6 +71,11 @@ let numberOfBullets = getRandomMinToMax(3,8)
 
 //check who won
 function checkWinner() {
+
+  //after dealing some damage this functions will update the number of hearts the (player/dealer) have
+  //I put it here so it makes sure to update the hearts so it clear the (player/dealer) lost
+  updateHearts(playerHealth, dealerHealth);
+
   if (playerHealth <= 0) {
     playerWon = false
     gameEnd = true
@@ -187,66 +197,86 @@ useHandSawBtn.textContent = `Hand Saw [${items[2][1]}]`
 useHandcuffBtn.textContent = `Handcuff [${items[3][1]}]`
 }
 
-function reloadChamber() {
 
-giveItems();
-updateTextItems();
-
-
-  for (let index = 0; index < numberOfBullets; index++) {
-  
-       if (Math.random() >= 0.5) {
-         chamber.push(1)
-       }
-       else
-       {
-         chamber.push(0)
-       }
-       
-  
-  
-      }
-    
-  
-  console.log(chamber);
-  
-}
-
-
-
-//Check Probability to decide wither to shoot Player or Dealer
-function checkProbability(chamber) {
-    let liveShell = 0
-    let emptyShell = 0
-
-// Counting the number of live shells and empty shells
+//Counting number of live shells and empty ones
+function countingLiveandEmptyShells() {
+  liveShell = 0
+  emptyShell = 0
   for (let index = 0; index < chamber.length; index++) {
     
     if (chamber[index] === 1) {
       liveShell = liveShell + 1
-
+      
     } else if (chamber[index] === 0)
       {
-      emptyShell = emptyShell + 1
+        emptyShell = emptyShell + 1
+      }
+      
+      
+    }
+}
+
+//Check Probability to decide wither to shoot Player or Dealer
+function checkProbability() {
+ 
+  
+  // Counting the number of live shells and empty shells
+  countingLiveandEmptyShells();
+    //================================================
+    
+    console.log(liveShell);
+    console.log(emptyShell);
+    
+    //if true then the dealer will shoot if false he will shoot himself
+    if ((liveShell > emptyShell) || (emptyShell === 1 && liveShell === 1)) {
+      console.log('dealer shot you');
+      return true;
+    } else {
+      console.log('dealer did not shoot you');
+      
+      return false;
+    }
+  }
+  function reloadChamber() {
+  
+  giveItems();
+  updateTextItems();
+  
+  
+    for (let index = 0; index < numberOfBullets; index++) {
+    
+         if (Math.random() >= 0.5) {
+           chamber.push(1)
+         }
+         else
+         {
+           chamber.push(0)
+         }
+         
+    
+    
+        }
+      
+    
+    console.log(chamber);
+
+    //Counting so it does not reveal the order of what is in the chamber
+    countingLiveandEmptyShells();
+  
+    if (!shellsEls) return;
+    shellsEls.innerHTML = "";
+
+  
+    for (let index = 0; index < liveShell; index++) {      
+     shellsEls.innerHTML += '<img src="/assets/live-shell.jpg" alt="live-shell" class="shell-img">';
     }
 
+    for (let index = 0; index < emptyShell; index++) {
+      shellsEls.innerHTML += '<img src="/assets/empty-shell.jpg" alt="empty-shell" class="shell-img">';
+    }
     
   }
-//================================================
-
-console.log(liveShell);
-console.log(emptyShell);
-
-//if true then the dealer will shoot if false he will shoot himself
-  if ((liveShell > emptyShell) || (emptyShell === 1 && liveShell === 1)) {
-    console.log('dealer shot you');
-    return true;
-  } else {
-    console.log('dealer did not shoot you');
-
-    return false;
-  }
-}
+  
 
 function checkChamper() {
    //Check if there is nothing in chamber, if true; reload.
@@ -261,7 +291,7 @@ function dealerTurn() {
     return;
   }
   //Dealer's Turn
-    dealerDecision = checkProbability(chamber);
+    dealerDecision = checkProbability();
 
     if (dealerDecision) {
       if (chamber[chamber.length -1] === 1) {
@@ -314,10 +344,25 @@ function dealerTurn() {
       dealer health: ${dealerHealth}`);
 }
 
+
+function updateHearts(playerHealth, dealerHealth) {
+
+  
+  playerHeartsEl.forEach((heart, index) => {
+    heart.classList.toggle("lost-heart", index >= playerHealth);
+  });
+
+  dealerHeartsEl.forEach((heart, index) => {
+    heart.classList.toggle("lost-heart", index >= dealerHealth);
+  });
+}
+
+
 function shootChamber(xHealth) {
 
   console.log("shot");
     if (chamber[chamber.length -1] === 1) {
+
 
       if (isSawUsed === true) {
         console.log("success");
@@ -325,6 +370,8 @@ function shootChamber(xHealth) {
       chamber.pop()
       console.log(chamber);
       isSawUsed = false
+
+
       
 
       }
@@ -357,13 +404,14 @@ function shootChamber(xHealth) {
         isCuffUsed = false
       }
       }
-   return xHealth;  
+       return xHealth;  
       
     } 
     
     else {
 
       chamber.pop()
+      checkChamper();
       return xHealth;
     
     }
@@ -436,11 +484,18 @@ startButtonEl.addEventListener('click', () => {
 
 
 shootDealer.addEventListener('click', () => {
+  //after dealing some damage this functions will update the number of hearts the (player/dealer) have
+  updateHearts(playerHealth, dealerHealth);
+
   if (gameEnd === true) {
     return;
   }
   
   dealerHealth = shootChamber(dealerHealth);
+
+  //after dealing some damage this functions will update the number of hearts the (player/dealer) have
+  updateHearts(playerHealth, dealerHealth);
+
 
 
   checkWinner();
@@ -465,6 +520,8 @@ shootPlayer.addEventListener('click', () => {
 
   
   playerHealth = shootChamber(playerHealth);
+  //after dealing some damage this functions will update the number of hearts the (player/dealer) have
+  updateHearts(playerHealth, dealerHealth);
 
   
 
@@ -473,7 +530,7 @@ shootPlayer.addEventListener('click', () => {
 
     
  //Check if there is nothing in chamber, if true; reload.
- checkChamper
+ checkChamper();
 
  //if he did not shot himself with live shell; then granted another round
 if (playerTurn === true) return;
