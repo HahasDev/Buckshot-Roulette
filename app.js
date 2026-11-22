@@ -544,6 +544,9 @@ if (playerTurn === true) return;
 
 takePillBtn.addEventListener('click', () => {
 takePill(playerHealth);
+//after dealing some damage this functions will update the number of hearts the (player/dealer) have
+updateHearts(playerHealth, dealerHealth);
+
 updateTextItems();
 
 })
