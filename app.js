@@ -130,7 +130,7 @@ function takePill(player) {
 
 
 function useMagnifier() {
-  if ((items[1][1] === 0 && playerTurn === true) || (items[5][1] && playerTurn === false)) {
+  if ((items[1][1] === 0 && playerTurn === true) || (items[5][1] == 0 && playerTurn === false)) {
 
     return;
   }
@@ -244,7 +244,7 @@ function checkProbability() {
 async function showShellsTwoSec() {
   if (!shellsEls) return;
   shellsEls.innerHTML = "";
-
+timeLeft = 2;
 
   for (let index = 0; index < liveShell; index++) {
     shellsEls.innerHTML += '<img src="/assets/live-shell.png" alt="live-shell" class="shell-live">';
@@ -253,8 +253,8 @@ async function showShellsTwoSec() {
   for (let index = 0; index < emptyShell; index++) {
     shellsEls.innerHTML += '<img src="/assets/empty-shell.png" alt="empty-shell" class="shell-empty">';
   }
-  await waitOneSec();
-  await waitOneSec();
+  await waitXSec(2000);
+
 
   shellsEls.innerHTML = "";
 
@@ -289,22 +289,8 @@ function reloadChamber() {
   showShellsTwoSec();
 }
 
-const updateTimer = () => {
-  timeLeft = timeLeft - 1;
 
-  if (timeLeft <= 0) {
-    clearInterval(timerId);
-    timerId = null;
-    if (chamber[chamber.length - 1] === 1 && playerTurn === false) {
-      swapDealerShootingImg();
-    }
-    else if ((chamber[chamber.length - 1] === 1 && playerTurn === false)) {
-
-    }
-  }
-};
-
-function waitOneSec() {
+function waitXSec(sec) {
   return new Promise((resolve) => {
     clearInterval(timerId);
     timerId = setInterval(() => {
@@ -315,7 +301,7 @@ function waitOneSec() {
         timerId = null;
         resolve();
       }
-    }, 1000);
+    }, sec);
   });
 }
 
@@ -326,23 +312,56 @@ function waitOneSec() {
 //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function
 
 async function swapDealerShootingImg() {
+  checkChamper();
   //if there is no imgaes and no array then return // it is If guard
   if (!dealerEls || !dealerEls.length) return;
 
   timeLeft = 2;
   dealerEls[0].src = "assets/dealer-aiming.png";
-
-  if (timeLeft === 0 && chamber[chamber.length - 1] === 1) {
-    await waitOneSec();
+  await waitXSec(2000);
+  console.log(chamber);
+  if (chamber[chamber.length - 1] === 1) {
     dealerEls[0].src = "assets/dealer-shooting.png";
+    updateHearts(playerHealth, dealerHealth);
+
   }
 
   timeLeft = 1;
-  await waitOneSec();
+  await waitXSec(1000);
 
   if (timeLeft === 0) {
     dealerEls[0].src = "assets/dealer.png";
     checkWinner();
+  }
+}
+
+async function swapDealerShootingSelfImg() {
+  checkChamper();
+
+  //if there is no imgaes and no array then return // it is If guard
+  if (!dealerEls || !dealerEls.length) return;
+
+  timeLeft = 2;
+  dealerEls[0].src = "assets/dealer-aiming-self.png";
+
+  await waitXSec(2000);
+
+
+  if (chamber[chamber.length - 1] === 1) {
+    dealerEls[0].src = "assets/dealer-shooting-self.png";
+    await waitXSec(1000);
+
+  }
+
+ 
+
+  if (timeLeft === 0) {
+  timeLeft = 1;
+
+    dealerEls[0].src = "assets/dealer.png";
+    checkWinner();
+  await waitXSec(1000);
+
   }
 }
 
@@ -353,8 +372,8 @@ function checkChamper() {
 
   }
 }
-
-function dealerTurn() {
+// async so it does wait to check if chamber have live or empty shell before deciding to show img of fire or not 
+async function dealerTurn() {
   if (gameEnd === true) {
     return;
   }
@@ -362,8 +381,9 @@ function dealerTurn() {
   dealerDecision = checkProbability();
 
   if (dealerDecision) {
+    checkChamper()
     if (chamber[chamber.length - 1] === 1) {
-      swapDealerShootingImg();
+      await swapDealerShootingImg();
 
       playerHealth = playerHealth - 1
       console.log(playerHealth);
@@ -372,7 +392,7 @@ function dealerTurn() {
       playerTurn = true
 
     } else {
-      swapDealerShootingImg();
+      await swapDealerShootingImg();
 
       playerTurn = true;
 
@@ -384,13 +404,18 @@ function dealerTurn() {
   }
   else {
     if (chamber[chamber.length - 1] === 1) {
+      await swapDealerShootingSelfImg();
 
       dealerHealth = dealerHealth - 1
       chamber.pop()
       console.log(chamber);
       playerTurn = true
 
+      updateHearts(playerHealth, dealerHealth);
+
+
     } else {
+      await swapDealerShootingSelfImg();
       playerTurn = false;
       chamber.pop()
       checkChamper()
