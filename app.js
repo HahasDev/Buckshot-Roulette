@@ -23,6 +23,9 @@ const shellsEls = document.querySelector('.shells');
 
 let dealerEls = document.querySelectorAll('.dealer img');
 
+const liveShellEl = document.getElementById('liveShell');
+const emptyShellEl = document.getElementById('emptyShell');
+
 
 
 console.log(openInstructionsButtonEl, instructionsModalEl)
@@ -244,7 +247,7 @@ function checkProbability() {
 async function showShellsTwoSec() {
   if (!shellsEls) return;
   shellsEls.innerHTML = "";
-timeLeft = 2;
+  timeLeft = 2;
 
   for (let index = 0; index < liveShell; index++) {
     shellsEls.innerHTML += '<img src="/assets/live-shell.png" alt="live-shell" class="shell-live">';
@@ -294,7 +297,7 @@ function waitXSec(sec) {
   return new Promise((resolve) => {
     clearInterval(timerId);
     timerId = setInterval(() => {
-      timeLeft = timeLeft - 1;
+      timeLeft = timeLeft - 0.5;
 
       if (timeLeft <= 0) {
         clearInterval(timerId);
@@ -316,18 +319,26 @@ async function swapDealerShootingImg() {
   //if there is no imgaes and no array then return // it is If guard
   if (!dealerEls || !dealerEls.length) return;
 
-  timeLeft = 2;
+  timeLeft = 1;
   dealerEls[0].src = "assets/dealer-aiming.png";
-  await waitXSec(2000);
+  await waitXSec(1000);
   console.log(chamber);
+
   if (chamber[chamber.length - 1] === 1) {
     dealerEls[0].src = "assets/dealer-shooting.png";
     updateHearts(playerHealth, dealerHealth);
 
+    await liveShellEl.play();
+    timeLeft = 0.5;
+    await waitXSec(500)
+
   }
 
-  timeLeft = 1;
-  await waitXSec(1000);
+  if (chamber[chamber.length - 1] === 0) {
+    emptyShellEl.play()
+  }
+  timeLeft = 0.5;
+  await waitXSec(500);
 
   if (timeLeft === 0) {
     dealerEls[0].src = "assets/dealer.png";
@@ -341,26 +352,37 @@ async function swapDealerShootingSelfImg() {
   //if there is no imgaes and no array then return // it is If guard
   if (!dealerEls || !dealerEls.length) return;
 
-  timeLeft = 2;
+  timeLeft = 1;
   dealerEls[0].src = "assets/dealer-aiming-self.png";
 
-  await waitXSec(2000);
+  await waitXSec(1000);
 
 
   if (chamber[chamber.length - 1] === 1) {
     dealerEls[0].src = "assets/dealer-shooting-self.png";
-    await waitXSec(1000);
+    updateHearts(playerHealth, dealerHealth);
 
+    await liveShellEl.play();
+    timeLeft = 0.5;
+    await waitXSec(500);
+  }
+  else if (chamber[chamber.length - 1] === 0) {
+    timeLeft = 0.5;
+    await emptyShellEl.play();
+
+
+    await waitXSec(500);
   }
 
- 
+
+
 
   if (timeLeft === 0) {
-  timeLeft = 1;
+    timeLeft = 1;
 
     dealerEls[0].src = "assets/dealer.png";
     checkWinner();
-  await waitXSec(1000);
+    await waitXSec(1000);
 
   }
 }
@@ -383,9 +405,9 @@ async function dealerTurn() {
   if (dealerDecision) {
     checkChamper()
     if (chamber[chamber.length - 1] === 1) {
+      playerHealth = playerHealth - 1
       await swapDealerShootingImg();
 
-      playerHealth = playerHealth - 1
       console.log(playerHealth);
       chamber.pop()
       console.log(chamber);
@@ -416,6 +438,7 @@ async function dealerTurn() {
 
     } else {
       await swapDealerShootingSelfImg();
+
       playerTurn = false;
       chamber.pop()
       checkChamper()
@@ -447,7 +470,7 @@ function updateHearts(playerHealth, dealerHealth) {
 
 
 function shootChamber(xHealth) {
-
+  console.log("shot", { shell: chamber[chamber.length - 1], playerTurn });
   console.log("shot");
   if (chamber[chamber.length - 1] === 1) {
 
@@ -471,6 +494,8 @@ function shootChamber(xHealth) {
 
     //if the player did not shoot himself with live shell; player gets to go again
     if (playerTurn === true) {
+      liveShellEl.play();
+
 
       playerTurn = false
 
@@ -498,6 +523,7 @@ function shootChamber(xHealth) {
 
     chamber.pop()
     if (playerTurn === true) {
+      emptyShellEl.play();
 
       if (shotPlayer === true) {
         playerTurn = true
@@ -597,7 +623,7 @@ startButtonEl.addEventListener('click', () => {
 })
 
 
-shootDealer.addEventListener('click', () => {
+shootDealer.addEventListener('click', async () => {
   //after dealing some damage this functions will update the number of hearts the (player/dealer) have
   updateHearts(playerHealth, dealerHealth);
 
@@ -607,6 +633,9 @@ shootDealer.addEventListener('click', () => {
 
   shotDealer = true
   dealerHealth = shootChamber(dealerHealth);
+
+  timeLeft = 1
+  await waitXSec(1000)
 
   //after dealing some damage this functions will update the number of hearts the (player/dealer) have
   updateHearts(playerHealth, dealerHealth);
@@ -628,13 +657,18 @@ shootDealer.addEventListener('click', () => {
 })
 
 //Logic When the Player shoot himself
-shootPlayer.addEventListener('click', () => {
+shootPlayer.addEventListener('click', async () => {
   if (gameEnd === true) {
     return;
   }
 
   shotPlayer = true
   playerHealth = shootChamber(playerHealth);
+
+  timeLeft = 1
+  await waitXSec(1000)
+
+
   //after dealing some damage this functions will update the number of hearts the (player/dealer) have
   updateHearts(playerHealth, dealerHealth);
 
