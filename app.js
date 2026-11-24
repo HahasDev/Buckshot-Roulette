@@ -238,6 +238,29 @@ function checkProbability() {
     return false;
   }
 }
+
+
+//https://stackoverflow.com/questions/16043755/modifying-img-src-using-innerhtml
+async function showShellsTwoSec() {
+  if (!shellsEls) return;
+  shellsEls.innerHTML = "";
+
+
+  for (let index = 0; index < liveShell; index++) {
+    shellsEls.innerHTML += '<img src="/assets/live-shell.png" alt="live-shell" class="shell-live">';
+  }
+
+  for (let index = 0; index < emptyShell; index++) {
+    shellsEls.innerHTML += '<img src="/assets/empty-shell.png" alt="empty-shell" class="shell-empty">';
+  }
+  await waitOneSec();
+  await waitOneSec();
+
+  shellsEls.innerHTML = "";
+
+
+}
+
 function reloadChamber() {
 
   giveItems();
@@ -263,18 +286,7 @@ function reloadChamber() {
   //Counting so it does not reveal the order of what is in the chamber
   countingLiveandEmptyShells();
 
-  if (!shellsEls) return;
-  shellsEls.innerHTML = "";
-
-
-  for (let index = 0; index < liveShell; index++) {
-    shellsEls.innerHTML += '<img src="/assets/live-shell.png" alt="live-shell" class="shell-live">';
-  }
-
-  for (let index = 0; index < emptyShell; index++) {
-    shellsEls.innerHTML += '<img src="/assets/empty-shell.png" alt="empty-shell" class="shell-empty">';
-  }
-
+  showShellsTwoSec();
 }
 
 const updateTimer = () => {
