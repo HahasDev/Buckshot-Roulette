@@ -131,6 +131,22 @@ function takePill(player) {
 
 //useMagnifier
 
+async function swapDealerShootingImg() {
+  checkChamper();
+  //if there is no imgaes and no array then return // it is If guard
+  if (!dealerEls || !dealerEls.length) return;
+
+  timeLeft = 1;
+  dealerEls[0].src = "assets/dealer-magnifier.png";
+  await waitXSec(1000);
+
+
+  
+
+  if (timeLeft === 0) {
+    dealerEls[0].src = "assets/dealer.png";
+  }
+}
 
 function useMagnifier() {
   if ((items[1][1] === 0 && playerTurn === true) || (items[5][1] == 0 && playerTurn === false)) {
@@ -140,6 +156,7 @@ function useMagnifier() {
 
   if (playerTurn === true) {
     items[1][1] -= 1
+    
   }
   else {
     items[5][1] -= 1
@@ -478,6 +495,8 @@ function shootChamber(xHealth) {
     if (isSawUsed === true) {
       console.log("success");
       xHealth -= 2
+      updateHearts(playerHealth, dealerHealth);
+
       chamber.pop()
       console.log(chamber);
       isSawUsed = false
@@ -488,7 +507,10 @@ function shootChamber(xHealth) {
     }
     else if (isSawUsed === false) {
       console.log("normal shot");
+
       xHealth -= 1
+      updateHearts(playerHealth, dealerHealth);
+
       chamber.pop()
     }
 
@@ -633,12 +655,14 @@ shootDealer.addEventListener('click', async () => {
 
   shotDealer = true
   dealerHealth = shootChamber(dealerHealth);
+  
+//after dealing some damage this functions will update the number of hearts the (player/dealer) have
+  updateHearts(playerHealth, dealerHealth);
 
   timeLeft = 1
   await waitXSec(1000)
 
-  //after dealing some damage this functions will update the number of hearts the (player/dealer) have
-  updateHearts(playerHealth, dealerHealth);
+  
 
 
 
@@ -665,14 +689,12 @@ shootPlayer.addEventListener('click', async () => {
   shotPlayer = true
   playerHealth = shootChamber(playerHealth);
 
-  timeLeft = 1
-  await waitXSec(1000)
-
 
   //after dealing some damage this functions will update the number of hearts the (player/dealer) have
   updateHearts(playerHealth, dealerHealth);
 
-
+  timeLeft = 1
+  await waitXSec(1000)
 
   checkWinner();
   if (gameEnd === true) return;
