@@ -21,6 +21,10 @@ const dealerHeartsEl = document.querySelectorAll('.dealer-hearts .heart');
 
 const shellsEls = document.querySelector('.shells');
 
+let dealerEls = document.querySelectorAll('.dealer img');
+
+
+
 console.log(openInstructionsButtonEl, instructionsModalEl)
 console.dir(startButtonEl);
 console.log(shootDealer);
@@ -40,15 +44,15 @@ let dealerDecision
 const items = [
   // left determines if it will be player(0) or Dealer(1)
   // Right determines the number of the items the player will have
-[0,0],// Player's pill
-[0,0],// Player's magnifier
-[0,0],// Player's handsaw
-[0,0],// Player's handcuff
-//Dealer's items
-[1,0],//Dealer's pill
-[1,0],//Dealer's magnifier
-[1,0],//Dealer's handsaw
-[1,0],//Dealer's handcuff
+  [0, 0],// Player's pill
+  [0, 0],// Player's magnifier
+  [0, 0],// Player's handsaw
+  [0, 0],// Player's handcuff
+  //Dealer's items
+  [1, 0],//Dealer's pill
+  [1, 0],//Dealer's magnifier
+  [1, 0],//Dealer's handsaw
+  [1, 0],//Dealer's handcuff
 ]
 
 
@@ -60,10 +64,13 @@ let playerWon = false
 let isSawUsed = false
 let isCuffUsed = false
 
-let numberOfBullets = getRandomMinToMax(3,8)
+let numberOfBullets = getRandomMinToMax(3, 8)
 
- let liveShell = 0
- let emptyShell = 0
+let liveShell = 0
+let emptyShell = 0
+
+let timeLeft = 1;
+let timerId = null;
 
 
 
@@ -85,14 +92,13 @@ function checkWinner() {
     playerWon = true
   }
 
-   if (gameEnd === true && playerWon === true) {
-      console.log(`Player Won $70,000`);
-      return;
-    } else if(gameEnd === true && playerWon === false)
-    {
-      console.log(`Dealer Won The Game`);
-      return;
-    } 
+  if (gameEnd === true && playerWon === true) {
+    console.log(`Player Won $70,000`);
+    return;
+  } else if (gameEnd === true && playerWon === false) {
+    console.log(`Dealer Won The Game`);
+    return;
+  }
 }
 
 //items
@@ -107,14 +113,13 @@ function takePill(player) {
   if (player < 4) {
 
     if (playerTurn === true) {
-        playerHealth += 1
-        items[0][1] -= 1
+      playerHealth += 1
+      items[0][1] -= 1
     }
-    else
-      {
-        dealerHealth += 1
-        items[4][1] -= 1
-      }
+    else {
+      dealerHealth += 1
+      items[4][1] -= 1
+    }
 
   } else {
     return
@@ -125,16 +130,15 @@ function takePill(player) {
 
 
 function useMagnifier() {
-  if ( (items[1][1] === 0 && playerTurn === true) || (items[5][1] && playerTurn === false) ) {
+  if ((items[1][1] === 0 && playerTurn === true) || (items[5][1] && playerTurn === false)) {
 
     return;
   }
 
   if (playerTurn === true) {
-        items[1][1] -= 1
+    items[1][1] -= 1
   }
-  else
-  {
+  else {
     items[5][1] -= 1
   }
 
@@ -143,39 +147,37 @@ function useMagnifier() {
 
 //Hand Saw
 function useHandSaw() {
-  
-if ( (items[2][1] === 0 && playerTurn === true) || (items[6][1] && playerTurn === false) ) {
+
+  if ((items[2][1] === 0 && playerTurn === true) || (items[6][1] && playerTurn === false)) {
     return false;
   }
 
   if (playerTurn === true) {
-   
-      items[2][1] -= 1
-      return true
+
+    items[2][1] -= 1
+    return true
   }
-  else
-  {
+  else {
     items[6][1] -= 1
     return true;
   }
- 
+
 }
 
 
 
 
-function useHandcuff(){
-    if ( (items[3][1] === 0 && playerTurn === true) || (items[7][1] && playerTurn === false) ) {
+function useHandcuff() {
+  if ((items[3][1] === 0 && playerTurn === true) || (items[7][1] && playerTurn === false)) {
     return;
   }
 
   if (playerTurn === true) {
-        items[3][1] -= 1
+    items[3][1] -= 1
     return true;
 
   }
-  else
-  {
+  else {
     items[7][1] -= 1
     return true;
 
@@ -191,10 +193,10 @@ function getRandomMinToMax(min, max) {
 }
 
 function updateTextItems() {
-takePillBtn.textContent = `Pill [${items[0][1]}]`
-useMagnifierBtn.textContent = `Magnifier [${items[1][1]}]`
-useHandSawBtn.textContent = `Hand Saw [${items[2][1]}]`
-useHandcuffBtn.textContent = `Handcuff [${items[3][1]}]`
+  takePillBtn.textContent = `Pill [${items[0][1]}]`
+  useMagnifierBtn.textContent = `Magnifier [${items[1][1]}]`
+  useHandSawBtn.textContent = `Hand Saw [${items[2][1]}]`
+  useHandcuffBtn.textContent = `Handcuff [${items[3][1]}]`
 }
 
 
@@ -203,87 +205,141 @@ function countingLiveandEmptyShells() {
   liveShell = 0
   emptyShell = 0
   for (let index = 0; index < chamber.length; index++) {
-    
+
     if (chamber[index] === 1) {
       liveShell = liveShell + 1
-      
-    } else if (chamber[index] === 0)
-      {
-        emptyShell = emptyShell + 1
-      }
-      
-      
+
+    } else if (chamber[index] === 0) {
+      emptyShell = emptyShell + 1
     }
+
+
+  }
 }
 
 //Check Probability to decide wither to shoot Player or Dealer
 function checkProbability() {
- 
-  
+
+
   // Counting the number of live shells and empty shells
   countingLiveandEmptyShells();
-    //================================================
-    
-    console.log(liveShell);
-    console.log(emptyShell);
-    
-    //if true then the dealer will shoot if false he will shoot himself
-    if ((liveShell > emptyShell) || (emptyShell === 1 && liveShell === 1)) {
-      console.log('dealer shot you');
-      return true;
-    } else {
-      console.log('dealer did not shoot you');
-      
-      return false;
-    }
+  //================================================
+
+  console.log(liveShell);
+  console.log(emptyShell);
+
+  //if true then the dealer will shoot if false he will shoot himself
+  if ((liveShell > emptyShell) || (emptyShell === 1 && liveShell === 1)) {
+    console.log('dealer shot you');
+    return true;
+  } else {
+    console.log('dealer did not shoot you');
+
+    return false;
   }
-  function reloadChamber() {
-  
+}
+function reloadChamber() {
+
   giveItems();
   updateTextItems();
-  
-  
-    for (let index = 0; index < numberOfBullets; index++) {
-    
-         if (Math.random() >= 0.5) {
-           chamber.push(1)
-         }
-         else
-         {
-           chamber.push(0)
-         }
-         
-    
-    
-        }
-      
-    
-    console.log(chamber);
 
-    //Counting so it does not reveal the order of what is in the chamber
-    countingLiveandEmptyShells();
-  
-    if (!shellsEls) return;
-    shellsEls.innerHTML = "";
 
-  
-    for (let index = 0; index < liveShell; index++) {      
-     shellsEls.innerHTML += '<img src="/assets/live-shell.jpg" alt="live-shell" class="shell-img">';
+  for (let index = 0; index < numberOfBullets; index++) {
+
+    if (Math.random() >= 0.5) {
+      chamber.push(1)
+    }
+    else {
+      chamber.push(0)
     }
 
-    for (let index = 0; index < emptyShell; index++) {
-      shellsEls.innerHTML += '<img src="/assets/empty-shell.jpg" alt="empty-shell" class="shell-img">';
-    }
-    
+
+
   }
-  
+
+
+  console.log(chamber);
+
+  //Counting so it does not reveal the order of what is in the chamber
+  countingLiveandEmptyShells();
+
+  if (!shellsEls) return;
+  shellsEls.innerHTML = "";
+
+
+  for (let index = 0; index < liveShell; index++) {
+    shellsEls.innerHTML += '<img src="/assets/live-shell.png" alt="live-shell" class="shell-live">';
+  }
+
+  for (let index = 0; index < emptyShell; index++) {
+    shellsEls.innerHTML += '<img src="/assets/empty-shell.png" alt="empty-shell" class="shell-empty">';
+  }
+
+}
+
+const updateTimer = () => {
+  timeLeft = timeLeft - 1;
+
+  if (timeLeft <= 0) {
+    clearInterval(timerId);
+    timerId = null;
+    if (chamber[chamber.length - 1] === 1 && playerTurn === false) {
+      swapDealerShootingImg();
+    }
+    else if ((chamber[chamber.length - 1] === 1 && playerTurn === false)) {
+
+    }
+  }
+};
+
+function waitOneSec() {
+  return new Promise((resolve) => {
+    clearInterval(timerId);
+    timerId = setInterval(() => {
+      timeLeft = timeLeft - 1;
+
+      if (timeLeft <= 0) {
+        clearInterval(timerId);
+        timerId = null;
+        resolve();
+      }
+    }, 1000);
+  });
+}
+
+//https://stackoverflow.com/questions/38060349/replace-image-by-javascript
+
+//I already know about async
+//but I still took from MDN
+//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function
+
+async function swapDealerShootingImg() {
+  //if there is no imgaes and no array then return // it is If guard
+  if (!dealerEls || !dealerEls.length) return;
+
+  timeLeft = 2;
+  dealerEls[0].src = "assets/dealer-aiming.png";
+
+  if (timeLeft === 0 && chamber[chamber.length - 1] === 1) {
+    await waitOneSec();
+    dealerEls[0].src = "assets/dealer-shooting.png";
+  }
+
+  timeLeft = 1;
+  await waitOneSec();
+
+  if (timeLeft === 0) {
+    dealerEls[0].src = "assets/dealer.png";
+    checkWinner();
+  }
+}
 
 function checkChamper() {
-   //Check if there is nothing in chamber, if true; reload.
-    if (chamber.length === 0) {
-      reloadChamber();
-      
-    }
+  //Check if there is nothing in chamber, if true; reload.
+  if (chamber.length === 0) {
+    reloadChamber();
+
+  }
 }
 
 function dealerTurn() {
@@ -291,63 +347,58 @@ function dealerTurn() {
     return;
   }
   //Dealer's Turn
-    dealerDecision = checkProbability();
+  dealerDecision = checkProbability();
 
-    if (dealerDecision) {
-      if (chamber[chamber.length -1] === 1) {
+  if (dealerDecision) {
+    if (chamber[chamber.length - 1] === 1) {
+      swapDealerShootingImg();
 
       playerHealth = playerHealth - 1
       console.log(playerHealth);
       chamber.pop()
       console.log(chamber);
       playerTurn = true
-      
-     } else {
+
+    } else {
+      swapDealerShootingImg();
+
       playerTurn = true;
 
       chamber.pop()
-      
-     }
-     console.log(`player health ${playerHealth} 
-      dealer health: ${dealerHealth}`);
+
     }
-    else{
-    if (chamber[chamber.length -1] === 1) {
+    console.log(`player health ${playerHealth} 
+      dealer health: ${dealerHealth}`);
+  }
+  else {
+    if (chamber[chamber.length - 1] === 1) {
 
       dealerHealth = dealerHealth - 1
       chamber.pop()
       console.log(chamber);
       playerTurn = true
-      
-     } else {
+
+    } else {
       playerTurn = false;
       chamber.pop()
       checkChamper()
-      dealerTurn()   
-     }
+      dealerTurn()
+    }
 
   }
 
 
-  checkWinner();
-   if (gameEnd === true && playerWon === true) {
-      console.log(`Player Won $70,000`);
-    } else if(gameEnd === true && playerWon === false)
-    {
-      console.log(`Dealer Won The Game`);
-      
-    } 
 
-    checkChamper()
+  checkChamper()
 
-    console.log(`player health ${playerHealth} 
+  console.log(`player health ${playerHealth} 
       dealer health: ${dealerHealth}`);
 }
 
 
 function updateHearts(playerHealth, dealerHealth) {
 
-  
+
   playerHeartsEl.forEach((heart, index) => {
     heart.classList.toggle("lost-heart", index >= playerHealth);
   });
@@ -361,61 +412,89 @@ function updateHearts(playerHealth, dealerHealth) {
 function shootChamber(xHealth) {
 
   console.log("shot");
-    if (chamber[chamber.length -1] === 1) {
+  if (chamber[chamber.length - 1] === 1) {
 
 
-      if (isSawUsed === true) {
-        console.log("success");
+    if (isSawUsed === true) {
+      console.log("success");
       xHealth -= 2
       chamber.pop()
       console.log(chamber);
       isSawUsed = false
 
 
-      
 
-      }
-      else if(isSawUsed === false)
-      {
-        console.log("normal shot");
-        xHealth -= 1
-        chamber.pop()
-      }
-      
-     if (playerTurn === true) {
-      //if the player did not shoot himself with live shell; player gets to go again
-      if (xHealth !== playerHealth) {
-        playerTurn = false
-      }
+
+    }
+    else if (isSawUsed === false) {
+      console.log("normal shot");
+      xHealth -= 1
+      chamber.pop()
+    }
+
+    //if the player did not shoot himself with live shell; player gets to go again
+    if (playerTurn === true) {
+
+      playerTurn = false
+
 
       //if player Cuffed Dealer; Player gets to go again
       if (isCuffUsed === true) {
         playerTurn = true
         isCuffUsed = false
       }
-     }
-      else if(playerTurn === false) 
-      {
+    }
+    else if (playerTurn === false) {
       dealerHealth -= 1
       playerTurn = true
-        //if Dealer Cuffed Player; Dealer gets to go again
+      //if Dealer Cuffed Player; Dealer gets to go again
       if (isCuffUsed === true) {
         playerTurn = false
         isCuffUsed = false
       }
-      }
-       return xHealth;  
-      
-    } 
-    
-    else {
-
-      chamber.pop()
-      checkChamper();
-      return xHealth;
-    
     }
-   
+    return xHealth;
+
+  }
+
+  else {
+
+    chamber.pop()
+    if (playerTurn === true) {
+
+      if (shotPlayer === true) {
+        playerTurn = true
+        shotPlayer = false
+        shotDealer = false
+      }
+      else {
+        playerTurn = false
+        shotPlayer = false
+        shotDealer = false
+      }
+
+    }
+    else if (playerTurn === false) {
+      if (shotPlayer === true) {
+        playerTurn = true
+        shotPlayer = false
+        shotDealer = false
+
+      }
+      else {
+        playerTurn = false
+        shotPlayer = false
+        shotDealer = false
+
+      }
+
+    }
+
+    checkChamper();
+    return xHealth;
+
+  }
+
 
 
 }
@@ -423,33 +502,31 @@ function shootChamber(xHealth) {
 // Items Functions
 
 function giveItems() {
-    let numberofItems = getRandomMinToMax(1, 2)
-    let whatItem 
+  let numberofItems = getRandomMinToMax(1, 2)
+  let whatItem
 
   for (let index = 0; index < 2; index++) {
     whatItem = getRandomMinToMax(1, 4)
-  
+
 
     if (numberofItems === 2 && index === 0) {
-      items[whatItem -1 ][1] += 2
+      items[whatItem - 1][1] += 2
     }
-    else
-    {
-      items[whatItem -1 ][1] += 1
+    else {
+      items[whatItem - 1][1] += 1
 
     }
   }
 
   for (let index = 0; index < 2; index++) {
     whatItem = getRandomMinToMax(5, 8)
-  
+
 
     if (numberofItems === 2 && index === 0) {
-      items[whatItem -1 ][1] += 2
+      items[whatItem - 1][1] += 2
     }
-    else
-    {
-      items[whatItem -1 ][1] += 1
+    else {
+      items[whatItem - 1][1] += 1
 
     }
   }
@@ -464,7 +541,7 @@ function giveItems() {
 // Event Listeners
 
 openInstructionsButtonEl.addEventListener('click', () => {
-    instructionsModalEl.showModal()
+  instructionsModalEl.showModal()
 })
 
 closeInstructionsButtonEl.addEventListener('click', () => {
@@ -477,7 +554,7 @@ startButtonEl.addEventListener('click', () => {
   gameStartedEl.removeAttribute("hidden")
   console.log(gameStartedEl);
   panelEl.style.display = 'none'
-  
+
   reloadChamber();
 
 })
@@ -490,7 +567,8 @@ shootDealer.addEventListener('click', () => {
   if (gameEnd === true) {
     return;
   }
-  
+
+  shotDealer = true
   dealerHealth = shootChamber(dealerHealth);
 
   //after dealing some damage this functions will update the number of hearts the (player/dealer) have
@@ -503,73 +581,73 @@ shootDealer.addEventListener('click', () => {
 
 
 
-    //Check if there is nothing in chamber, if true; reload.
-   checkChamper();
+  //Check if there is nothing in chamber, if true; reload.
+  checkChamper();
 
-if (playerTurn === true) return;
+  if (playerTurn === true) return;
 
 
-    dealerTurn();
+  dealerTurn();
 })
 
 //Logic When the Player shoot himself
 shootPlayer.addEventListener('click', () => {
-    if (gameEnd === true) {
+  if (gameEnd === true) {
     return;
   }
 
-  
+  shotPlayer = true
   playerHealth = shootChamber(playerHealth);
   //after dealing some damage this functions will update the number of hearts the (player/dealer) have
   updateHearts(playerHealth, dealerHealth);
 
-  
+
 
   checkWinner();
   if (gameEnd === true) return;
 
-    
- //Check if there is nothing in chamber, if true; reload.
- checkChamper();
 
- //if he did not shot himself with live shell; then granted another round
-if (playerTurn === true) return;
+  //Check if there is nothing in chamber, if true; reload.
+  checkChamper();
 
- //Dealer's Turn
- dealerTurn();
- 
-    
-  
+  //if he did not shot himself with live shell; then granted another round
+  if (playerTurn === true) return;
+
+  //Dealer's Turn
+  dealerTurn();
+
+
+
 })
 
 takePillBtn.addEventListener('click', () => {
-takePill(playerHealth);
-//after dealing some damage this functions will update the number of hearts the (player/dealer) have
-updateHearts(playerHealth, dealerHealth);
+  takePill(playerHealth);
+  //after dealing some damage this functions will update the number of hearts the (player/dealer) have
+  updateHearts(playerHealth, dealerHealth);
 
-updateTextItems();
+  updateTextItems();
 
 })
 
 
 useMagnifierBtn.addEventListener('click', () => {
-useMagnifier();
-updateTextItems();
+  useMagnifier();
+  updateTextItems();
 
 })
 
 
 useHandSawBtn.addEventListener('click', () => {
-isSawUsed = useHandSaw();
-console.log(isSawUsed);
-updateTextItems();
+  isSawUsed = useHandSaw();
+  console.log(isSawUsed);
+  updateTextItems();
 
 })
 
 
 useHandcuffBtn.addEventListener('click', () => {
-isCuffUsed = useHandcuff();
-console.log(isCuffUsed);
-updateTextItems();
+  isCuffUsed = useHandcuff();
+  console.log(isCuffUsed);
+  updateTextItems();
 
 })
