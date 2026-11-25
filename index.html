@@ -1,123 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="./css/style.css">
-    <script src="./app.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <script src="./app.js" defer></script>
 
-
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon_io/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon_io/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./assets/favicon_io/favicon-16x16.png">
+  <link rel="manifest" href="./assets/favicon_io/site.webmanifest">
 
 </head>
+
 <body>
-    
+
   <main class="game-panel">
-  <h1>Buckshot Roulette</h1>
+    <h1>Buckshot Roulette</h1>
 
 
 
-  <div class="controls">
-    <button class="action-button" id="start" type="button">
-      Start Game
-    </button>
+    <div class="controls">
+      <button class="action-button" id="start" type="button">
+        Start Game
+      </button>
 
-   
-    <button class="action-button" id="open-instructions" type="button">
-      How to play
-    </button>
 
-  </div>
+      <button class="action-button" id="open-instructions" type="button">
+        How to play
+      </button>
 
-  <dialog id="instructions">
-    <h2>How to play <button class="action-button" id="close-instructions" type="button">
-     ❌
-    </button></h2>
-     
-    <p>
+    </div>
+
+    <dialog id="instructions">
+      <h2>How to play <button class="action-button" id="close-instructions" type="button">
+          ❌
+        </button></h2>
+
+      <p>
         -You have 4 Health points <br>
         -A number of shells will appear for 1 second, make sure to remember<br>
         -Either you shoot at yourself, or your opponent with the hope it is a live shell<br>
         -You will have items to help you drain your oppoent health
-    </p>
-       
-
-  </dialog>
+      </p>
 
 
+    </dialog>
 
-</main>
 
-<section class = "game-panel" id="game-started" hidden>
-<audio id="emptyShell" src="assets/empty-shell.mp3"></audio>
-<audio id="liveShell" src="assets/live-shell.mp3"></audio>
 
-<div class="dealer-hearts">
-    <img src="/assets/heart.png" alt="heart" class="heart">
-    <img src="/assets/heart.png" alt="heart" class="heart">
-    <img src="/assets/heart.png" alt="heart" class="heart">
-    <img src="/assets/heart.png" alt="heart" class="heart">
+  </main>
 
-</div>
+  <section class="game-panel" id="game-started" hidden>
+    <audio id="emptyShell" src="./assets/empty-shell.mp3"></audio>
+    <audio id="liveShell" src="./assets/live-shell.mp3"></audio>
 
-  <div class="shells">
-  <div id="shells"></div>
-  <img src="assets/empty-shell.png" alt="empty-shell">
-  <img src="assets/live-shell.png" alt="live-shell">
-</div>
-<div id="middle-slot" class="middle-slot">
+    <div class="dealer-hearts">
+      <img src="./assets/heart.png" alt="heart" class="heart">
+      <img src="./assets/heart.png" alt="heart" class="heart">
+      <img src="./assets/heart.png" alt="heart" class="heart">
+      <img src="./assets/heart.png" alt="heart" class="heart">
 
-  <div class="dealer">
+    </div>
 
-    <img src="assets/dealer.png" alt="Dealer-static">
-    
-  </div>
+    <div class="shells">
+      <div id="shells"></div>
+      <img src="./assets/empty-shell.png" alt="empty-shell">
+      <img src="./assets/live-shell.png" alt="live-shell">
+    </div>
+    <div id="middle-slot" class="middle-slot">
 
-</div>
+      <div class="dealer">
 
-  
+        <img src="./assets/dealer.png" alt="Dealer-static">
+        <img id="magnifier-result" alt="Chamber shell" hidden>
+     
+
+      </div>
+
+    </div>
+
+
 
 
     <div class="bottom-controls">
 
-  <div class="player-hearts">
-   <img src="/assets/heart.png" alt="heart" class="heart">
-   <img src="/assets/heart.png" alt="heart" class="heart">
-   <img src="/assets/heart.png" alt="heart" class="heart">
-   <img src="/assets/heart.png" alt="heart" class="heart">
-  </div>
+      <div class="player-hearts">
+        <img src="/assets/heart.png" alt="heart" class="heart">
+        <img src="/assets/heart.png" alt="heart" class="heart">
+        <img src="/assets/heart.png" alt="heart" class="heart">
+        <img src="/assets/heart.png" alt="heart" class="heart">
+      </div>
 
 
-  
 
-  <div class="action-grid"> 
 
-    <button class="shoot-btn" id="shootPlayer" type="button">
-      Shoot yourself
-    </button>
-    <button class="shoot-btn" id="shootDealer" type="button">
-      Shoot Dealer
-    </button>
-    <button class="item-btn" id="takePill" type="button">
-      Pill
-    </button>
-    
-    <button class="item-btn" id="handcuff" type="button">
-      Handcuff
-    </button>
-    
-    <button class="item-btn" id="handSaw" type="button">
-      Hand Saw
-    </button>
-    
-    <button class="item-btn" id="magnifier" type="button">
-      Magnifier
-    </button>
-    
-  
-  
-   
+      <div class="action-grid">
 
-</section>
+        <button class="shoot-btn" id="shootPlayer" type="button">
+          Shoot yourself
+        </button>
+        <button class="shoot-btn" id="shootDealer" type="button">
+          Shoot Dealer
+        </button>
+        <button class="item-btn" id="takePill" type="button">
+          Pill
+        </button>
+
+        <button class="item-btn" id="handcuff" type="button">
+          Handcuff
+        </button>
+
+        <button class="item-btn" id="handSaw" type="button">
+          Hand Saw
+        </button>
+
+        <button class="item-btn" id="magnifier" type="button">
+          Magnifier
+        </button>
+
+
+
+
+
+  </section>
 </body>
+
 </html>
