@@ -2,6 +2,10 @@
 
 const openInstructionsButtonEl = document.querySelector('#open-instructions')
 const instructionsModalEl = document.querySelector('#instructions')
+const endGameModalEl = document.querySelector('#game-end')
+const endGamePEl = document.querySelector('#game-end-text')
+
+const reloadPage = document.querySelector('#reload-page')
 const closeInstructionsButtonEl = document.querySelector('#close-instructions')
 
 const startButtonEl = document.querySelector('#start')
@@ -36,12 +40,9 @@ const playerButtons = [
   useHandcuffBtn
 ];
 
-
 console.log(openInstructionsButtonEl, instructionsModalEl)
 console.dir(startButtonEl);
 console.log(shootDealer);
-
-
 
 //Variables
 
@@ -67,7 +68,6 @@ const items = [
   [1, 0],//Dealer's handcuff
 ]
 
-
 let shotPlayer = false
 let shotDealer = false
 let gameEnd = false
@@ -85,7 +85,6 @@ let emptyShell = 0
 
 let timeLeft = 2;
 let timerId = null;
-
 
 const SPEED = 1;
 
@@ -113,10 +112,12 @@ function checkWinner() {
   if (playerHealth <= 0) {
     playerWon = false
     gameEnd = true
+    gameEndMessage();
   }
   else if (dealerHealth <= 0) {
     gameEnd = true
     playerWon = true
+    gameEndMessage();
   }
 
   if (gameEnd === true && playerWon === true) {
@@ -146,10 +147,10 @@ async function playPillAnimation() {
   dealerEls[0].src = "./assets/dealer-after-pill.png";
   await waitXSec(2000);
 
+  dealerEls[0].src = "./assets/dealer.png";
+  await waitXSec(1000);
 
-  if (timeLeft <= 0) {
-    dealerEls[0].src = "./assets/dealer.png";
-  }
+
 }
 //pill
 async function takePill() {
@@ -161,11 +162,8 @@ async function takePill() {
   //max health is 4
   if (playerHealth < 4 && playerTurn === true) {
 
-
     playerHealth += 1
     items[0][1] -= 1
-
-
 
   } else if (dealerHealth < 4 && playerTurn === false) {
 
@@ -173,7 +171,6 @@ async function takePill() {
     items[4][1] -= 1
     await playPillAnimation();
     updateHearts(playerHealth, dealerHealth);
-
 
     return
   }
@@ -189,6 +186,8 @@ async function dealerMagnifierImg() {
   await waitXSec(2000);
 
   dealerEls[0].src = "./assets/dealer.png";
+  await waitXSec(1000);
+
 
 }
 
@@ -207,7 +206,6 @@ async function playerMagnifierImg() {
   magnifierResultEl.hidden = true;
   magnifierResultEl.removeAttribute("src");
 }
-
 
 async function useMagnifier() {
   if (((items[1][1] === 0 && playerTurn === true) || isMagnifierUsed === true) || ((items[5][1] === 0 && playerTurn === false) || isMagnifierUsed === true)) {
@@ -248,15 +246,16 @@ async function dealerHandSawImg() {
   dealerEls[0].src = "./assets/dealer-handsaw-4.png";
   await waitXSec(250);
 
-  if (timeLeft <= 0) {
-    dealerEls[0].src = "./assets/dealer.png";
-  }
+  dealerEls[0].src = "./assets/dealer.png";
+  await waitXSec(1000);
+
+
 }
 
 //Hand Saw
 async function useHandSaw() {
 
-  if (((items[2][1] === 0 && playerTurn === true) || isSawUsed === 1) || ((items[6][1] === 0 && playerTurn === false) || isSawUsed === 1)) {
+  if (((items[2][1] === 0 && playerTurn === true) || isSawUsed === true) || ((items[6][1] === 0 && playerTurn === false) || isSawUsed === true)) {
     return false;
   }
 
@@ -274,9 +273,6 @@ async function useHandSaw() {
 
 }
 
-
-
-
 //Handcuff
 
 async function playerHandcuffImg() {
@@ -284,7 +280,6 @@ async function playerHandcuffImg() {
   if (!dealerEls || !dealerEls.length) return;
 
   dealerEls[0].src = "./assets/dealer-cuffed.png";
-
 
 }
 
@@ -296,10 +291,9 @@ async function dealerHandcuffImg() {
   dealerEls[0].src = "./assets/dealer-handcufd.png";
   await waitXSec(2000);
 
+  dealerEls[0].src = "./assets/dealer.png";
+  await waitXSec(1000);
 
-  if (timeLeft <= 0) {
-    dealerEls[0].src = "./assets/dealer.png";
-  }
 }
 
 async function useHandcuff() {
@@ -321,7 +315,6 @@ async function useHandcuff() {
   }
 }
 
-
 function getRandomMinToMax(min, max) {
   //I searched the opposite of floor because the if I put it as floor the chances of getting 8 water bullets is so low 
   return Math.round(Math.random() * (max - min) + min);
@@ -333,7 +326,6 @@ function updateTextItems() {
   useHandSawBtn.textContent = `Hand Saw [${items[2][1]}]`
   useHandcuffBtn.textContent = `Handcuff [${items[3][1]}]`
 }
-
 
 //Counting number of live shells and empty ones
 function countingLiveandEmptyShells() {
@@ -348,13 +340,11 @@ function countingLiveandEmptyShells() {
       emptyShell = emptyShell + 1
     }
 
-
   }
 }
 
 //Check Probability to decide wither to shoot Player or Dealer
 async function checkProbability() {
-
 
   // Counting the number of live shells and empty shells
   countingLiveandEmptyShells();
@@ -398,7 +388,6 @@ async function checkProbability() {
   }
 }
 
-
 //https://stackoverflow.com/questions/16043755/modifying-img-src-using-innerhtml
 async function showShellsTwoSec() {
   if (!shellsEls) return;
@@ -414,9 +403,7 @@ async function showShellsTwoSec() {
   }
   await waitXSec(4000);
 
-
   shellsEls.innerHTML = "";
-
 
 }
 
@@ -424,7 +411,6 @@ function reloadChamber() {
 
   giveItems();
   updateTextItems();
-
 
   for (let index = 0; index < numberOfBullets; index++) {
 
@@ -435,10 +421,7 @@ function reloadChamber() {
       chamber.push(0)
     }
 
-
-
   }
-
 
   console.log(chamber);
 
@@ -447,8 +430,6 @@ function reloadChamber() {
 
   showShellsTwoSec();
 }
-
-
 
 function waitXSec(sec) {
   return new Promise((resolve) => {
@@ -492,8 +473,8 @@ async function swapDealerShootingImg() {
 
   await waitXSec(1000);
 
-
   dealerEls[0].src = "./assets/dealer.png";
+  await waitXSec(1000);
   checkWinner();
 
 }
@@ -509,7 +490,6 @@ async function swapDealerShootingSelfImg() {
 
   await waitXSec(1000);
 
-
   if (chamber[chamber.length - 1] === 1) {
     dealerEls[0].src = "./assets/dealer-shooting-self.png";
     updateHearts(playerHealth, dealerHealth);
@@ -521,7 +501,6 @@ async function swapDealerShootingSelfImg() {
   else if (chamber[chamber.length - 1] === 0) {
     await emptyShellEl.play();
     timeLeft = 1;
-
 
     await waitXSec(1000);
   }
@@ -571,14 +550,12 @@ async function dealerTurn() {
       await swapDealerShootingSelfImg();
       await showDealerShot();
 
-
       dealerHealth = dealerHealth - 1
       chamber.pop()
       console.log(chamber);
       playerTurn = true
 
       updateHearts(playerHealth, dealerHealth);
-
 
     } else {
       await swapDealerShootingSelfImg();
@@ -591,8 +568,6 @@ async function dealerTurn() {
 
   }
 
-
-
   checkChamper()
 
   console.log(`player health ${playerHealth} 
@@ -601,9 +576,7 @@ async function dealerTurn() {
 
 }
 
-
 function updateHearts(playerHealth, dealerHealth) {
-
 
   playerHeartsEl.forEach((heart, index) => {
     heart.classList.toggle("lost-heart", index >= playerHealth);
@@ -614,15 +587,12 @@ function updateHearts(playerHealth, dealerHealth) {
   });
 }
 
-
 function shootChamber(xHealth) {
   isMagnifierUsed = false
-
 
   console.log("shot", { shell: chamber[chamber.length - 1], playerTurn });
   console.log("shot");
   if (chamber[chamber.length - 1] === 1) {
-
 
     if (isSawUsed === true) {
       console.log("success");
@@ -632,9 +602,6 @@ function shootChamber(xHealth) {
       chamber.pop()
       console.log(chamber);
       isSawUsed = false
-
-
-
 
     }
     else if (isSawUsed === false) {
@@ -650,9 +617,7 @@ function shootChamber(xHealth) {
     if (playerTurn === true) {
       liveShellEl.play();
 
-
       playerTurn = false
-
 
       //if player Cuffed Dealer; Player gets to go again
       if (isCuffUsed === true) {
@@ -711,8 +676,6 @@ function shootChamber(xHealth) {
 
   }
 
-
-
 }
 
 // Items Functions
@@ -723,7 +686,6 @@ function giveItems() {
 
   for (let index = 0; index < 9; index++) {
     whatItem = getRandomMinToMax(1, 4)
-
 
     if (numberofItems === 2 && index === 0) {
       items[whatItem - 1][1] += 2
@@ -736,7 +698,6 @@ function giveItems() {
 
   for (let index = 0; index < 2; index++) {
     whatItem = getRandomMinToMax(5, 8)
-
 
     if (numberofItems === 2 && index === 0) {
       items[whatItem - 1][1] += 2
@@ -765,9 +726,24 @@ async function showDealerShot() {
 
   await waitXSec(500);
 
-
   dealerEls[0].src = "./assets/dealer.png";
+  await waitXSec(1000);
 
+
+}
+
+function gameEndMessage() {
+  if (gameEnd === true) {
+    if (playerWon === true) {
+      endGamePEl.textContent = " CONGRATULATIONS YOU WON $70,000!!"
+      endGameModalEl.showModal()
+    }
+    else {
+      endGamePEl.textContent = "YOU LOST, BUT I WON'T BLAME YOU!!"
+      endGameModalEl.showModal()
+    }
+
+  }
 }
 //==========================
 
@@ -781,6 +757,11 @@ closeInstructionsButtonEl.addEventListener('click', () => {
   instructionsModalEl.close()
 })
 
+reloadPage.addEventListener('click', () => {
+  location.reload()
+  //https://developer.mozilla.org/en-US/docs/Web/API/Location/reload
+})
+
 startButtonEl.addEventListener('click', () => {
   //https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/display
   // startButtonEl.style.display = 'none'
@@ -792,43 +773,33 @@ startButtonEl.addEventListener('click', () => {
 
 })
 
-
 shootDealer.addEventListener('click', async () => {
   //after dealing some damage this functions will update the number of hearts the (player/dealer) have
   updateHearts(playerHealth, dealerHealth);
-
 
   if (gameEnd === true) {
     return;
   }
 
   shotDealer = true
-
-
+  if (chamber[chamber.length - 1] === 1) {
+    await showDealerShot();
+  }
   dealerHealth = shootChamber(dealerHealth);
-if (chamber[chamber.length -1] === 1) {
-  await showDealerShot();
-  
-}
+
   dealerEls[0].src = "./assets/dealer.png";
+  await waitXSec(1000);
+
   //after dealing some damage this functions will update the number of hearts the (player/dealer) have
   updateHearts(playerHealth, dealerHealth);
 
-
-
-
-
-
   checkWinner();
   if (gameEnd === true) return;
-
-
 
   //Check if there is nothing in chamber, if true; reload.
   checkChamper();
 
   if (playerTurn === true) return;
-
 
   dealerTurn();
 })
@@ -842,14 +813,11 @@ shootPlayer.addEventListener('click', async () => {
   shotPlayer = true
   playerHealth = shootChamber(playerHealth);
 
-
   //after dealing some damage this functions will update the number of hearts the (player/dealer) have
   updateHearts(playerHealth, dealerHealth);
 
-
   checkWinner();
   if (gameEnd === true) return;
-
 
   //Check if there is nothing in chamber, if true; reload.
   checkChamper();
@@ -859,7 +827,6 @@ shootPlayer.addEventListener('click', async () => {
 
   //Dealer's Turn
   dealerTurn();
-
 
 })
 
@@ -876,7 +843,6 @@ takePillBtn.addEventListener('click', async () => {
 
 })
 
-
 useMagnifierBtn.addEventListener('click', () => {
   if (gameEnd === true) {
     return;
@@ -886,7 +852,6 @@ useMagnifierBtn.addEventListener('click', () => {
   updateTextItems();
 
 })
-
 
 useHandSawBtn.addEventListener('click', async () => {
   if (gameEnd === true) {
@@ -899,7 +864,6 @@ useHandSawBtn.addEventListener('click', async () => {
 
 })
 
-
 useHandcuffBtn.addEventListener('click', async () => {
   if (gameEnd === true) {
     return;
@@ -910,3 +874,5 @@ useHandcuffBtn.addEventListener('click', async () => {
   updateTextItems();
 
 })
+
+

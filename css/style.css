@@ -87,6 +87,10 @@ padding: 8px;
 border: 2px dashed var(--color-primary);
 padding: 8px;
 }
+#game-end > p {
+border: 2px dashed var(--color-primary);
+padding: 8px;
+}
 
 .tile {
 min-height: 4rem;
@@ -122,7 +126,15 @@ box-sizing: content-box;
     justify-content: space-between; 
 }
 
+#game-end::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
 
+
+#game-end h2 {
+    display: flex;
+    justify-content: space-between; 
+}
 
 #game-started {
   position: relative;
